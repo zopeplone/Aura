@@ -2,7 +2,8 @@
 
 
 #include "Character/AuraEnemy.h"
-
+#include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAttributeSet.h"
 #include "Aura/Aura.h"
 
 AAuraEnemy::AAuraEnemy()
@@ -10,6 +11,14 @@ AAuraEnemy::AAuraEnemy()
 	//将网格碰撞检测中的Visibility通道打开,
 	//让AuraPlayerController中的GetHitResultUnderCursor能够在ECC_Visibility通道碰撞到敌人
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
+	//初始化敌人类的AbilitySystemComponent
+	AbilitySystemComponent = CreateDefaultSubobject<UAuraAbilitySystemComponent>("AbilitySystemComponent");
+	//开启服务端复制,将该组件的状态和行为在网络环境下从服务器同步到客户端
+	AbilitySystemComponent->SetIsReplicated(true);
+	//服务端复制的方式-Minimal（适合AI）
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	//初始化敌人类的AttributeSet
+	AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
 }
 
 void AAuraEnemy::HighlightActor()
@@ -27,4 +36,12 @@ void AAuraEnemy::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void AAuraEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	//初始化AuraEnemy的ActorInfo
+	AbilitySystemComponent->InitAbilityActorInfo(this,this);
+	
 }
