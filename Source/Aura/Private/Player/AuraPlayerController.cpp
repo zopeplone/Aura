@@ -12,9 +12,11 @@ void AAuraPlayerController::BeginPlay()
 	
 	//将输入映射上下文绑定到玩家控制器
 	check(AuraContext)
+	//在多人游戏中,如果有其他的玩家，此时在本机初始化其他玩家的时候，Subsystem为空
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem)
-	Subsystem->AddMappingContext(AuraContext,0);
+	if(Subsystem){
+		Subsystem->AddMappingContext(AuraContext,0);
+	}
 	//光标设置
 	//在游戏中始终显示鼠标光标
 	bShowMouseCursor = true;

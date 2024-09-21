@@ -5,7 +5,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
+#include "UI/HUD/AuraHUD.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -46,4 +48,18 @@ void AAuraCharacter::InitAbilityActorInfo()
 	//将PlayerState中的ASC和AS赋给Character,因为在Character构造函数中没有为ASC和AS赋值
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
+
+
+	//InitOverlay,此时PlayerController,PlayerState,ASC,AS都初始化好了,可以将这些数据与WidgetController绑定
+	//在多人游戏的客户端中，这个PlayerController可能为空，因为每个玩家只能拥有自己的PlayerController
+	//只有对于自己控制的角色，PlayerController不为空，当然，也不需要在自己的屏幕上添加其他角色的HUD
+	if(AAuraPlayerController* PlayerController = Cast<AAuraPlayerController>(GetController()))
+	{
+		//如果HUD有效，那么我们可以将数据通过HUD与WidgetController绑定
+		if(AAuraHUD* AuraHUD = Cast<AAuraHUD>(PlayerController->GetHUD()))
+		{
+			AuraHUD->InitOverlay(PlayerController,AuraPlayerState,AbilitySystemComponent,AttributeSet);
+		}
+	}
+	
 }
