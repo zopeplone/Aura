@@ -21,5 +21,5 @@ public:
 	// PlayerState 初始化时也会调用该函数
 	virtual void OnRep_PlayerState() override;
 private:
-	void InitAbilityActorInfo();
+	virtual void InitAbilityActorInfo() override;
 };
